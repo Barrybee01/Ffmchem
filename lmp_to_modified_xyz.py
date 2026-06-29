@@ -78,7 +78,3 @@ def lmp_to_modified_xyz(lmp_file, xyz_file):
 
         for atom_id, atom_type, x, y, z in atoms:
             outfile.write(f"{atom_type} {x:.10f} {y:.10f} {z:.10f}\n")
-
-
-if __name__ == "__main__": #for testing
-    lmp_to_modified_xyz("iceIV_ortho_x464.lmp","iceIV_ortho_x464_modified.xyz")
