@@ -67,6 +67,3 @@ def xyz_to_gro(xyz_file,gro_file,residue_name="MOL",title="Generated from XYZ",)
                 f"{0.0:10.5f} {0.0:10.5f} "
                 f"{xy:10.5f} {0.0:10.5f} "
                 f"{xz:10.5f} {yz:10.5f}\n")
-
-if __name__ == "__main__":
-    xyz_to_gro("structure.xyz","structure.gro",residue_name="MOL",title="Generated from XYZ")
