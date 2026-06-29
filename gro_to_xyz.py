@@ -70,6 +70,3 @@ def gro_to_xyz(gro_file, xyz_file):
 
         for atom_name, x, y, z in atoms:
             outfile.write(f"{atom_name} {x:.10f} {y:.10f} {z:.10f}\n")
-
-if __name__ == "__main__":
-    gro_to_xyz("structure.gro", "structure.xyz")
