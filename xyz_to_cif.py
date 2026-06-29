@@ -93,6 +93,3 @@ def xyz_to_cif(xyz_file, cif_file,lattice_type="triclinic",space_group="P 1"):
             outfile.write(
                 f"{label:>8s} {symbol:>4s} "
                 f"{fx:12.8f} {fy:12.8f} {fz:12.8f}\n")
-
-if __name__ == "__main__":
-    xyz_to_cif("structure.xyz", "structure.cif",lattice_type="triclinic",space_group="P 1")
