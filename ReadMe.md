@@ -21,4 +21,12 @@ During development, many of the scripts will be best suited for orthogonalized c
 - Numpy
 
 ## Installation Instructions
-This process should work with either Linux or Windows. I am unsure of how MacOS works, so I do not know if this tool will work there.
+This process should work with either Linux or Windows. I am unsure of how MacOS works, so I do not know if this tool will work there. After this, do the following:
+
+```
+git clone https://github.com/Barrybee01/Ffmchem.git
+
+python -m pip install -e .
+```
+
+## How To Use
