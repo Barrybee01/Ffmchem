@@ -191,6 +191,3 @@ def lammpstrj_to_xyz(lammpstrj_file, xyz_file, type_map=None, coordinate_mode="a
                 outfile.write(f"{symbol} {x:.10f} {y:.10f} {z:.10f}\n")
 
             i = atom_end
-
-if __name__ == "__main__":
-    lammpstrj_to_xyz("dump.lammpstrj", "dump_trj.xyz", type_map={1: "O", 2: "H"}, coordinate_mode="auto")
