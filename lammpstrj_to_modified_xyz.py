@@ -132,6 +132,3 @@ def lammpstrj_to_modified_xyz(lammpstrj_file,xyz_file,coordinate_mode="auto"):
                 outfile.write(f"{atom_type} {x:.10f} {y:.10f} {z:.10f}\n")
 
             i = atom_end
-
-if __name__ == "__main__":
-    lammpstrj_to_modified_xyz("dump.lammpstrj", "dump_modified.xyz",coordinate_mode="auto")
