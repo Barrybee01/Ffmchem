@@ -123,6 +123,3 @@ def cif_to_xyz(cif_file, xyz_file):
 
         for symbol, x, y, z in atoms:
             outfile.write(f"{symbol} {x:.10f} {y:.10f} {z:.10f}\n")
-
-if __name__ == "__main__":
-    cif_to_xyz("structure.cif","structure.xyz",)
