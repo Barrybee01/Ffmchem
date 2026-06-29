@@ -16,3 +16,9 @@ I will be slowly developing a command-line tool so that all of the converter scr
 
 During development, many of the scripts will be best suited for orthogonalized cells, but generalization to triclinic cells will be added with time. Conversion to `.vasp` (POSCAR) files will also eventually be added. Gromacs is another popular file type, but it will be added later. Codes like Atomsk or VASP exist and will perform similar tasks. This code will have some extra features, however. Any of the customized files used in this repo will be added to the converter, the converter will be set up to allow batch conversion, and there will be an option to make a series of files specific to atom types in the system.
 
+## Dependencies:
+- Python >= 3.9
+- Numpy
+
+## Installation Instructions
+This process should work with either Linux or Windows. I am unsure of how MacOS works, so I do not know if this tool will work there.
