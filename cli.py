@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import sys
 from cif_to_lmp import cif_to_lmp
 from cif_to_xyz import cif_to_xyz
 from gro_to_xyz import gro_to_xyz
@@ -12,7 +13,6 @@ from xyz_to_cif import xyz_to_cif
 from xyz_to_gro import xyz_to_gro
 from xyz_to_lmp import xyz_to_lmp
 
-
 EXTENSIONS = {
     "cif": ".cif",
     "lmp": ".lmp",
@@ -20,6 +20,24 @@ EXTENSIONS = {
     "gro": ".gro",
     "lammpstrj": ".lammpstrj",
 }
+
+VERSION = "1.0.0"
+AUTHOR = "Rielly Castle"
+DESCRIPTION = "A structure file converter"
+
+def print_banner():
+    banner_path = Path(__file__).with_name("banner.txt")
+
+    try:
+        with open(banner_path, "r", encoding="utf-8") as f:
+            print(f.read())
+    except FileNotFoundError:
+        print("FFMCHEM")
+
+    print(DESCRIPTION)
+    print(f"Version : {VERSION}")
+    print(f"Author  : {AUTHOR}")
+    print()
 
 def parse_atom_map(map_args):
     if map_args is None:
