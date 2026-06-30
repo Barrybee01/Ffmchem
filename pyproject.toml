@@ -30,3 +30,6 @@ py-modules = [
     "gro_to_xyz",
     "lammpstrj_to_xyz",
     "lammpstrj_to_modified_xyz"]
+
+[tool.setuptools.package-data]
+"*" = ["banner.txt"]
