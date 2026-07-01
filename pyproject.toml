@@ -11,7 +11,7 @@ requires-python = ">=3.9"
 
 authors = [{name = "Rielly Castle"}]
 
-dependencies = ["numpy",]
+dependencies = ["numpy"]
 
 [project.scripts]
 ffmchem = "cli:main"
@@ -29,7 +29,8 @@ py-modules = [
     "xyz_to_gro",
     "gro_to_xyz",
     "lammpstrj_to_xyz",
-    "lammpstrj_to_modified_xyz"]
+    "lammpstrj_to_modified_xyz",
+    "split_trajectory"]
 
 [tool.setuptools.package-data]
 "*" = ["banner.txt"]
