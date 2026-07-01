@@ -24,7 +24,7 @@ This process should work with either Linux or Windows. I am unsure of how MacOS 
 
 ```
 git clone https://github.com/Barrybee01/Ffmchem.git
-
+cd Ffmchem
 python -m pip install -e .
 ```
 
@@ -44,6 +44,7 @@ Some structure files are available in the examples folder to use for testing. Th
 --coordinates   The coordinate type used in a LAMMPS simulation (scaled, unscaled, wrapped). This can be specified or automatically detected
 --lattice-type  The lattice type needs to be entered for conversion to cif file format
 --space-group   The space group of the lattice needs to be entered for conversion to cif file format
+--split         Splits the trajectory into its individual time steps in either xyz format or lammpstrj format
 ```
 There are a few cases where an atomic map is required:  `.lmp` to `.cif`, `.lmp` to `.xyz`, `.cif` to `.lmp` and `.xyz` to `.lmp`. For example,
 
@@ -63,5 +64,5 @@ For batch analysis, you enter the input and output directories. For example, a c
 ffmchem --input /lmp/input/dir --output /xyz/output/dir --from lmp --to xyz --map 1:O 2:H --batch --atom-centric
 ```
 
-***At present, batch analysis only works when making `.xyz ` files***
+***At present, batch analysis only works when making `.xyz ` files***\
 ***Gromacs conversion is extremely experimental right now***
