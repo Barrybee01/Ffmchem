@@ -1,3 +1,5 @@
+import math
+
 def parse_symbol_map(symbol_map=None):
     if symbol_map is None:
         raise ValueError( "A symbol_map is required, for example: {'O': 1, 'H': 2}")
