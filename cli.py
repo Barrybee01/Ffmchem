@@ -11,8 +11,8 @@ from lmp_to_xyz import lmp_to_xyz
 from xyz_to_cif import xyz_to_cif
 from xyz_to_lmp import xyz_to_lmp
 from split_trajectory import split_trajectory
-from ffmchem.xyz_to_vasp import convert_xyz_to_vasp
-from ffmchem.vasp_to_xyz import convert_vasp_to_xyz
+from xyz_to_vasp import convert_xyz_to_vasp
+from vasp_to_xyz import convert_vasp_to_xyz
 
 
 EXTENSIONS = {
