@@ -26,8 +26,8 @@ py-modules = [
     "xyz_to_lmp",
     "xyz_to_cif",
     "cif_to_xyz",
-    "xyz_to_gro",
-    "gro_to_xyz",
+    "xyz_to_vasp",
+    "vasp_to_xyz",
     "lammpstrj_to_xyz",
     "lammpstrj_to_modified_xyz",
     "split_trajectory"]
