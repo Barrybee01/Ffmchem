@@ -8,24 +8,29 @@ I will be slowly developing a command-line tool so that all of the converter scr
 - `.lammpstrj` to a modified `.xyz` trajectory
 - `.cif` ↔ `.lmp` 
 - `.xyz` ↔ `.cif` 
-- `.gro` ↔ `.xyz` (experimental)
+- `.vasp` ↔ `.xyz`
 
 ## Data Prerequisites:
 - `.xyz` files need to have the cell parameters in the comment line.
-
-During development, many of the scripts will be best suited for orthogonalized cells, but generalization to triclinic cells will be added with time. Conversion to `.vasp` (POSCAR) files will also eventually be added. Gromacs is another popular file type, but it will be added later. Codes like Atomsk or VASP exist and will perform similar tasks. This code will have some extra features, however. Any of the customized files used in this repo will be added to the converter; the converter will be set up to allow batch conversion, and there will be an option to make a series of files specific to atom types in the system.
 
 ## Dependencies:
 - Python >= 3.9
 - Numpy
 
 ## Installation Instructions
-This process should work with either Linux or Windows. I am unsure of how MacOS works, so I do not know if this tool will work there. After this, do the following:
+Do the following for any Python environment::
 
 ```
 git clone https://github.com/Barrybee01/Ffmchem.git
 cd Ffmchem
 python -m pip install -e .
+```
+
+Because this tool was installed this way, updating the tool does not require it to be reinstalled. Instead, do the following:
+
+```
+cd Ffmchem
+git pull
 ```
 
 ## How To Use
