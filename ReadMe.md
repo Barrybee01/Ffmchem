@@ -31,6 +31,7 @@ Because this tool was installed this way, updating the tool does not require it 
 ```
 cd Ffmchem
 git pull
+python -m pip install -e .
 ```
 
 ## How To Use
