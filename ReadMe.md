@@ -70,5 +70,4 @@ For batch analysis, you enter the input and output directories. For example, a c
 ffmchem --input /lmp/input/dir --output /xyz/output/dir --from lmp --to xyz --map 1:O 2:H --batch --atom-centric
 ```
 
-***At present, batch analysis only works when making `.xyz ` files***\
-***Gromacs conversion is extremely experimental right now***
+***At present, batch analysis only works when making `.xyz ` files***
