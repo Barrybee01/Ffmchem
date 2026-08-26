@@ -14,7 +14,7 @@ from split_trajectory import split_trajectory
 from xyz_to_vasp import convert_xyz_to_vasp
 from vasp_to_xyz import convert_vasp_to_xyz
 from batch_convert import batch_convert
-
+from lmpstep_to_xyz import lmpstep_to_xyz 
 
 EXTENSIONS = {
     "cif": ".cif",
@@ -22,7 +22,8 @@ EXTENSIONS = {
     "xyz": ".xyz",
     "lammpstrj": ".lammpstrj",
     "vasp": ".vasp",
-    "POSCAR": ".vasp"
+    "POSCAR": ".vasp",
+    "lmpstep": ".lmpstep"
 }
 
 VERSION = "1.0.0"
@@ -173,33 +174,83 @@ def run_atom_centric_conversion(args, input_file, output_target):
 def run_batch_conversion(args):
     input_dir = Path(args.input)
     output_dir = Path(args.output)
+    
     if not input_dir.exists():
         raise ValueError(f"Input directory {input_dir} does not exist")
     output_dir.mkdir(parents=True, exist_ok=True)
+    
     type_map, symbol_map = parse_atom_map(args.map)
     mass_map = parse_mass_map(args.mass_map)
+    
+    # Define wrapper for lmpstep conversion
+    def lmpstep_wrapper(input_file, output_file):
+        lmpstep_to_xyz(input_file, output_file, type_map=type_map, coordinate_mode=args.coordinates)
+    
+    # Define wrapper for lmp conversion
+    def lmp_wrapper(input_file, output_file):
+        if args.modified:
+            lmp_to_modified_xyz(input_file, output_file)
+        else:
+            lmp_to_xyz(input_file, output_file, type_map=type_map)
+    
+    # Define wrapper for lammpstrj conversion
+    def lammpstrj_wrapper(input_file, output_file):
+        if args.modified:
+            lammpstrj_to_modified_xyz(input_file, output_file, coordinate_mode=args.coordinates)
+        else:
+            lammpstrj_to_xyz(input_file, output_file, type_map=type_map, coordinate_mode=args.coordinates)
+    
+    # Define wrapper for xyz to cif conversion
+    def xyz_to_cif_wrapper(input_file, output_file):
+        xyz_to_cif(input_file, output_file, lattice_type=args.lattice_type, space_group=args.space_group)
+    
+    # Define wrapper for lmp to cif conversion
+    def lmp_to_cif_wrapper(input_file, output_file):
+        lmp_to_cif(input_file, output_file, type_map=type_map, lattice_type=args.lattice_type, space_group=args.space_group)
+    
+    # Define wrapper for cif to lmp conversion
+    def cif_to_lmp_wrapper(input_file, output_file):
+        cif_to_lmp(input_file, output_file, symbol_map=symbol_map, mass_map=mass_map)
+    
+    # Define wrapper for xyz to lmp conversion
+    def xyz_to_lmp_wrapper(input_file, output_file):
+        xyz_to_lmp(input_file, output_file, symbol_map=symbol_map, mass_map=mass_map)
+    
+    # Define wrapper for xyz to vasp conversion
+    def xyz_to_vasp_wrapper(input_file, output_file):
+        convert_xyz_to_vasp(input_file, output_file, comment=args.title)
+    
     converters = {
-        ("lmp", "xyz"): (lmp_to_xyz if not args.modified else lmp_to_modified_xyz, ".lmp", ".xyz", {"type_map": type_map}),
-        ("xyz", "cif"): (xyz_to_cif, ".xyz", ".cif", {"lattice_type": args.lattice_type, "space_group": args.space_group}),
-        ("cif", "lmp"): (cif_to_lmp, ".cif", ".lmp", {"symbol_map": symbol_map, "mass_map": mass_map}),
-        ("lmp", "cif"): (lmp_to_cif, ".lmp", ".cif", {"type_map": type_map, "lattice_type": args.lattice_type, "space_group": args.space_group}),
-        ("xyz", "lmp"): (xyz_to_lmp, ".xyz", ".lmp", {"symbol_map": symbol_map, "mass_map": mass_map}),
-        ("xyz", "vasp"): (convert_xyz_to_vasp, ".xyz", ".vasp", {"comment": args.title}),
-        ("vasp", "xyz"): (convert_vasp_to_xyz, ".vasp", ".xyz", {}),
-        ("lammpstrj", "xyz"): (lammpstrj_to_modified_xyz if args.modified else lammpstrj_to_xyz, ".lammpstrj", ".xyz", {"type_map": type_map, "coordinate_mode": args.coordinates}),
-        ("cif", "xyz"): (cif_to_xyz, ".cif", ".xyz", {}),}
+        ("cif", "lmp"): (cif_to_lmp_wrapper, ".cif", ".lmp"),
+        ("cif", "xyz"): (cif_to_xyz, ".cif", ".xyz"),
+        ("lmp", "cif"): (lmp_to_cif_wrapper, ".lmp", ".cif"),
+        ("lmp", "xyz"): (lmp_wrapper, ".lmp", ".xyz"),
+        ("lmpstep", "xyz"): (lmpstep_wrapper, ".lmp", ".xyz"),
+        ("lammpstrj", "xyz"): (lammpstrj_wrapper, ".lammpstrj", ".xyz"),
+        ("xyz", "cif"): (xyz_to_cif_wrapper, ".xyz", ".cif"),
+        ("xyz", "lmp"): (xyz_to_lmp_wrapper, ".xyz", ".lmp"),
+        ("xyz", "vasp"): (xyz_to_vasp_wrapper, ".xyz", ".vasp"),
+        ("vasp", "xyz"): (convert_vasp_to_xyz, ".vasp", ".xyz"),
+    }
+    
     key = (args.input_format, args.output_format)
     if key not in converters:
         raise ValueError(f"Batch conversion not supported for {args.input_format} -> {args.output_format}")
-    converter_func, input_ext, output_ext, kwargs = converters[key]
+    
+    converter_func, input_ext, output_ext = converters[key]
+    
     if args.atom_centric:
         if args.output_format != "xyz":
             raise ValueError("--atom-centric currently only supports XYZ output.")
         input_files = sorted(input_dir.glob(f"*{input_ext}"))
+        if not input_files:
+            print(f"No {input_ext} files found in {input_dir}")
+            return
         for input_file in input_files:
-            run_atom_centric_conversion(args, input_file, output_dir / input_file.with_suffix(".xyz").name)
+            output_file = output_dir / input_file.with_suffix(".xyz").name
+            run_atom_centric_conversion(args, input_file, output_file)
     else:
-        batch_convert(input_folder=str(input_dir),output_folder=str(output_dir),converter_func=converter_func,input_ext=input_ext,output_ext=output_ext)
+        batch_convert(input_folder=str(input_dir),output_folder=str(output_dir),converter_func=converter_func,input_ext=input_ext, output_ext=output_ext)
 
 
 def main():
@@ -207,7 +258,7 @@ def main():
 
     parser.add_argument("--input",required=True,help="Input file for single conversion, or input directory when using --batch.")
     parser.add_argument("--output",required=True,help="Output file for single conversion, or output directory when using --batch.")
-    parser.add_argument("--from",dest="input_format",required=True,choices=["cif", "lmp", "xyz", "vasp", "lammpstrj"],help="Input file format.")
+    parser.add_argument("--from",dest="input_format",required=True,choices=["cif", "lmp", "xyz", "vasp", "lammpstrj", "lmpstep"],help="Input file format.")
     parser.add_argument("--to",dest="output_format", choices=["cif", "lmp", "xyz", "vasp"],help="Output file format.")
     parser.add_argument("--map",nargs="+",default=None,help="Atom type mapping. Example: --map 1:O 2:H")
     parser.add_argument("--mass-map",nargs="+",default=None,help="Atomic masses for LAMMPS data files. Example: --mass-map 1:15.999 2:1.008")
