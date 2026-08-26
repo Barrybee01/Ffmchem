@@ -31,7 +31,8 @@ py-modules = [
     "lammpstrj_to_xyz",
     "lammpstrj_to_modified_xyz",
     "split_trajectory",
-    "batch_convert"]
+    "batch_convert",
+    "lmpstep_to_xyz"]
 
 [tool.setuptools.package-data]
 "*" = ["banner.txt"]
