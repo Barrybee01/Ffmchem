@@ -13,6 +13,7 @@ from xyz_to_lmp import xyz_to_lmp
 from split_trajectory import split_trajectory
 from xyz_to_vasp import convert_xyz_to_vasp
 from vasp_to_xyz import convert_vasp_to_xyz
+from batch_convert import batch_convert
 
 
 EXTENSIONS = {
@@ -169,37 +170,37 @@ def run_atom_centric_conversion(args, input_file, output_target):
     split_xyz_by_atom_type(temp_file, output_dir, output_name=output_name)
     temp_file.unlink()
 
-def get_batch_output_file(input_file, input_dir, output_dir, output_format, modified=False):
-    input_file = Path(input_file)
-    input_dir = Path(input_dir)
-    output_dir = Path(output_dir)
-
-    stem = input_file.relative_to(input_dir).with_suffix("").name
-
-    if modified:
-        stem = f"{stem}_modified"
-    return output_dir / f"{stem}{EXTENSIONS[output_format]}"
-
 def run_batch_conversion(args):
     input_dir = Path(args.input)
     output_dir = Path(args.output)
+    if not input_dir.exists():
+        raise ValueError(f"Input directory {input_dir} does not exist")
     output_dir.mkdir(parents=True, exist_ok=True)
+    type_map, symbol_map = parse_atom_map(args.map)
+    mass_map = parse_mass_map(args.mass_map)
+    converters = {
+        ("lmp", "xyz"): (lmp_to_xyz if not args.modified else lmp_to_modified_xyz, ".lmp", ".xyz", {"type_map": type_map}),
+        ("xyz", "cif"): (xyz_to_cif, ".xyz", ".cif", {"lattice_type": args.lattice_type, "space_group": args.space_group}),
+        ("cif", "lmp"): (cif_to_lmp, ".cif", ".lmp", {"symbol_map": symbol_map, "mass_map": mass_map}),
+        ("lmp", "cif"): (lmp_to_cif, ".lmp", ".cif", {"type_map": type_map, "lattice_type": args.lattice_type, "space_group": args.space_group}),
+        ("xyz", "lmp"): (xyz_to_lmp, ".xyz", ".lmp", {"symbol_map": symbol_map, "mass_map": mass_map}),
+        ("xyz", "vasp"): (convert_xyz_to_vasp, ".xyz", ".vasp", {"comment": args.title}),
+        ("vasp", "xyz"): (convert_vasp_to_xyz, ".vasp", ".xyz", {}),
+        ("lammpstrj", "xyz"): (lammpstrj_to_modified_xyz if args.modified else lammpstrj_to_xyz, ".lammpstrj", ".xyz", {"type_map": type_map, "coordinate_mode": args.coordinates}),
+        ("cif", "xyz"): (cif_to_xyz, ".cif", ".xyz", {}),}
+    key = (args.input_format, args.output_format)
+    if key not in converters:
+        raise ValueError(f"Batch conversion not supported for {args.input_format} -> {args.output_format}")
+    converter_func, input_ext, output_ext, kwargs = converters[key]
+    if args.atom_centric:
+        if args.output_format != "xyz":
+            raise ValueError("--atom-centric currently only supports XYZ output.")
+        input_files = sorted(input_dir.glob(f"*{input_ext}"))
+        for input_file in input_files:
+            run_atom_centric_conversion(args, input_file, output_dir / input_file.with_suffix(".xyz").name)
+    else:
+        batch_convert(input_folder=str(input_dir),output_folder=str(output_dir),converter_func=converter_func,input_ext=input_ext,output_ext=output_ext)
 
-    input_extension = EXTENSIONS[args.input_format]
-    input_files = sorted(input_dir.glob(f"*{input_extension}"))
-
-    if not input_files:
-        raise ValueError(f"No {input_extension} files found in {input_dir}")
-
-    for input_file in input_files:
-        output_file = get_batch_output_file(input_file, input_dir,output_dir,args.output_format,modified=args.modified)
-
-        if args.atom_centric:
-            run_atom_centric_conversion(args, input_file, output_file)
-        else:
-            run_single_conversion(args, input_file, output_file)
-
-        print(f"Converted: {input_file}")
 
 def main():
     parser = argparse.ArgumentParser(description="Ffmchem: Command-line tool for converting between common atomistic structure file formats.")
