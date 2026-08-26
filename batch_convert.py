@@ -18,7 +18,7 @@ def batch_convert(input_folder, output_folder, converter_func, input_ext, output
         
         try:
             print(f"Converting: {os.path.basename(input_file)}")
-            converter_func(input_file, output_file, **kwargs)
+            converter_func(input_file, output_file)
         except Exception as e:
             print(f"Error: {e}")
     
