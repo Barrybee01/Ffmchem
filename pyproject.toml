@@ -30,7 +30,8 @@ py-modules = [
     "vasp_to_xyz",
     "lammpstrj_to_xyz",
     "lammpstrj_to_modified_xyz",
-    "split_trajectory"]
+    "split_trajectory",
+    "batch_convert"]
 
 [tool.setuptools.package-data]
 "*" = ["banner.txt"]
