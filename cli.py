@@ -259,7 +259,7 @@ def main():
     parser.add_argument("--input",required=True,help="Input file for single conversion, or input directory when using --batch.")
     parser.add_argument("--output",required=True,help="Output file for single conversion, or output directory when using --batch.")
     parser.add_argument("--from",dest="input_format",required=True,choices=["cif", "lmp", "xyz", "vasp", "lammpstrj", "lmpstep"],help="Input file format.")
-    parser.add_argument("--to",dest="output_format", choices=["cif", "lmp", "xyz", "vasp"],help="Output file format.")
+    parser.add_argument("--to",dest="output_format", choices=["cif", "lmp", "xyz", "vasp", "lmpstep"],help="Output file format.")
     parser.add_argument("--map",nargs="+",default=None,help="Atom type mapping. Example: --map 1:O 2:H")
     parser.add_argument("--mass-map",nargs="+",default=None,help="Atomic masses for LAMMPS data files. Example: --mass-map 1:15.999 2:1.008")
     parser.add_argument("--batch",action="store_true",help="Convert every matching file in the input directory.")
