@@ -47,7 +47,7 @@ def split_lammpstrj_trajectory(input_file, output_dir):
                         outfile.close()
 
                     step += 1
-                    output_file = output_dir / f"step_{step}.lammpsstp"
+                    output_file = output_dir / f"step_{step}.lmp"
                     outfile = open(output_file, "w")
 
                 if outfile is not None:
