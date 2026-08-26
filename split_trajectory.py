@@ -2,7 +2,7 @@ from pathlib import Path
 
 def split_xyz_trajectory(input_file, output_dir):
     input_file = Path(input_file)
-    output_dir = Path(output_dir) / "Split Trajectory"
+    output_dir = Path(output_dir) / "Split_Trajectory"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     step = 1
@@ -18,7 +18,7 @@ def split_xyz_trajectory(input_file, output_dir):
 
             n_atoms = int(atom_count_line.strip())
             comment_line = infile.readline()
-            output_file = output_dir / f"step_{step}.xyz"
+            output_file = output_dir / f"step_{step:03d}.xyz"
 
             with open(output_file, "w") as outfile:
                 outfile.write(atom_count_line)
@@ -34,7 +34,7 @@ def split_xyz_trajectory(input_file, output_dir):
 
 def split_lammpstrj_trajectory(input_file, output_dir):
     input_file = Path(input_file)
-    output_dir = Path(output_dir) / "Split Trajectory"
+    output_dir = Path(output_dir) / "Split_Trajectory"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     step = 0
@@ -47,7 +47,7 @@ def split_lammpstrj_trajectory(input_file, output_dir):
                         outfile.close()
 
                     step += 1
-                    output_file = output_dir / f"step_{step}.lmp"
+                    output_file = output_dir / f"step_{step:03d}.lmpstep"
                     outfile = open(output_file, "w")
 
                 if outfile is not None:
