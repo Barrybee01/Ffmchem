@@ -225,7 +225,7 @@ def run_batch_conversion(args):
         ("cif", "xyz"): (cif_to_xyz, ".cif", ".xyz"),
         ("lmp", "cif"): (lmp_to_cif_wrapper, ".lmp", ".cif"),
         ("lmp", "xyz"): (lmp_wrapper, ".lmp", ".xyz"),
-        ("lmpstep", "xyz"): (lmpstep_wrapper, ".lmp", ".xyz"),
+        ("lmpstep", "xyz"): (lmpstep_wrapper, ".lmpstep", ".xyz"),
         ("lammpstrj", "xyz"): (lammpstrj_wrapper, ".lammpstrj", ".xyz"),
         ("xyz", "cif"): (xyz_to_cif_wrapper, ".xyz", ".cif"),
         ("xyz", "lmp"): (xyz_to_lmp_wrapper, ".xyz", ".lmp"),
