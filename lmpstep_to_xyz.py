@@ -1,11 +1,14 @@
-import numpy as np
-
 def lmpstep_to_xyz(input_file, output_file, type_map=None, coordinate_mode="auto"):
     with open(input_file, 'r') as f:
         lines = f.readlines()
-    
-    # Parse the LAMMPS dump format
+        
     i = 0
+    timestep = 0
+    n_atoms = 0
+    box = None
+    atom_labels = []
+    atom_data_start = -1
+    
     while i < len(lines):
         line = lines[i].strip()
         
@@ -34,56 +37,70 @@ def lmpstep_to_xyz(input_file, output_file, type_map=None, coordinate_mode="auto
             zlo = float(z_bounds[0])
             zhi = float(z_bounds[1])
             
-            # If tilt is present, there are extra values
-            if tilt and len(x_bounds) > 2:
-                xy = float(x_bounds[2])
-                xz = float(y_bounds[2]) if len(y_bounds) > 2 else 0.0
-                yz = float(z_bounds[2]) if len(z_bounds) > 2 else 0.0
-            
             box = [[xlo, xhi], [ylo, yhi], [zlo, zhi]]
             
         elif line.startswith('ITEM: ATOMS'):
             # Parse atom data
-            atom_labels = line.split()[2:]  # Get column names
+            atom_labels = line.split()[2:]  # Get column names 
             i += 1
+            atom_data_start = i
+            break  
+        else:
+            i += 1
+    
+    if atom_data_start == -1:
+        raise ValueError(f"Could not find ITEM: ATOMS in file: {input_file}")
+    
+    # Read atom data
+    atom_lines = lines[atom_data_start:atom_data_start + n_atoms]
+    
+    if len(atom_lines) < n_atoms:
+        raise ValueError(f"Expected {n_atoms} atoms but found {len(atom_lines)} in {input_file}")
+    
+    # Parse atom data
+    atoms = []
+    for atom_line in atom_lines:
+        values = atom_line.strip().split()
+        if not values:
+            continue
             
-            # Read atom data
-            atom_lines = lines[i:i+n_atoms]
-            i += n_atoms
-            
-            # Parse atom data
-            atoms = []
-            for atom_line in atom_lines:
-                values = atom_line.strip().split()
-                atom_dict = dict(zip(atom_labels, values))
-                
-                # Convert values to appropriate types
-                atom_type = int(float(atom_dict.get('type', atom_dict.get('atom-type', 0))))
-                x = float(atom_dict.get('x', 0.0))
-                y = float(atom_dict.get('y', 0.0))
-                z = float(atom_dict.get('z', 0.0))
-                
-                # Handle scaled coordinates if needed
-                if coordinate_mode == "scaled" or (coordinate_mode == "auto" and 
-                    all(0 <= float(v) <= 1 for v in [x, y, z])):
-                    # Convert scaled to Cartesian
-                    x = xlo + x * (xhi - xlo)
-                    y = ylo + y * (yhi - ylo)
-                    z = zlo + z * (zhi - zlo)
-                
-                # Get element symbol from type_map
-                if type_map and atom_type in type_map:
-                    element = type_map[atom_type]
-                else:
-                    element = f"X{atom_type}" 
-                atoms.append((element, x, y, z))
-            
-            # Write XYZ file
-            with open(output_file, 'w') as f_out:
-                f_out.write(f"{len(atoms)}\n")
-                f_out.write(f"Timestep: {timestep}\n")
-                for element, x, y, z in atoms:
-                    f_out.write(f"{element} {x:.8f} {y:.8f} {z:.8f}\n")
-            return  
-
-    raise ValueError(f"Could not parse LAMMPS dump file: {input_file}")
+        atom_dict = dict(zip(atom_labels, values))
+        atom_type = None
+        for key in ['type', 'atom-type', 'element']:
+            if key in atom_dict:
+                try:
+                    atom_type = int(float(atom_dict[key]))
+                    break
+                except ValueError:
+                    continue
+        
+        if atom_type is None:
+            raise ValueError(f"Could not find atom type in line: {atom_line}")
+        
+        try:
+            x = float(atom_dict.get('x', 0.0))
+            y = float(atom_dict.get('y', 0.0))
+            z = float(atom_dict.get('z', 0.0))
+        except (ValueError, KeyError) as e:
+            raise ValueError(f"Could not parse coordinates in line: {atom_line}")
+        
+        if coordinate_mode == "scaled" or (coordinate_mode == "auto" and 
+            all(0 <= float(v) <= 1 for v in [x, y, z])):
+            # Convert scaled to Cartesian
+            if box is None:
+                raise ValueError("Box bounds not found for scaled coordinates")
+            x = box[0][0] + x * (box[0][1] - box[0][0])
+            y = box[1][0] + y * (box[1][1] - box[1][0])
+            z = box[2][0] + z * (box[2][1] - box[2][0])
+        
+        # Get element symbol from type_map
+        if type_map and atom_type in type_map:
+            element = type_map[atom_type]
+        
+        atoms.append((element, x, y, z))
+    
+    with open(output_file, 'w') as f_out:
+        f_out.write(f"{len(atoms)}\n")
+        f_out.write(f"Timestep: {timestep}\n")
+        for element, x, y, z in atoms:
+            f_out.write(f"{element} {x:.8f} {y:.8f} {z:.8f}\n")
