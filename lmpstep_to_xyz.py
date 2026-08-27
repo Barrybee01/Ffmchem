@@ -1,3 +1,5 @@
+import numpy as np
+
 def lmpstep_to_xyz(input_file, output_file, type_map=None, coordinate_mode="auto"):
     with open(input_file, 'r') as f:
         lines = f.readlines()
