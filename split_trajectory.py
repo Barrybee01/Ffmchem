@@ -5,7 +5,7 @@ def split_xyz_trajectory(input_file, output_dir):
     output_dir = Path(output_dir) / "Split_Trajectory"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    step = 1
+    step = 0 #start file number at *_000
     with open(input_file, "r") as infile:
         while True:
             atom_count_line = infile.readline()
@@ -37,7 +37,7 @@ def split_lammpstrj_trajectory(input_file, output_dir):
     output_dir = Path(output_dir) / "Split_Trajectory"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    step = 0
+    step = -1
     outfile = None
     try:
         with open(input_file, "r") as infile:
@@ -53,7 +53,7 @@ def split_lammpstrj_trajectory(input_file, output_dir):
                 if outfile is not None:
                     outfile.write(line)
 
-        if step == 0:
+        if step == -1:
             raise ValueError("No LAMMPS timesteps found. Expected lines starting with 'ITEM: TIMESTEP'.")
 
     finally:
