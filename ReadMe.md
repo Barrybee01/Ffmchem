@@ -6,6 +6,7 @@ I will be slowly developing a command-line tool so that all of the converter scr
 - `.lmp` to a modified `.xyz` format
 - `.lammpstrj` to a `.xyz` trajectory
 - `.lammpstrj` to a modified `.xyz` trajectory
+- `.lammpstrj` to individual timestep files (in LAMMPS trajectory format) that I am calling `.lmpstep`
 - `.cif` ↔ `.lmp` 
 - `.xyz` ↔ `.cif` 
 - `.vasp` ↔ `.xyz`
@@ -70,4 +71,10 @@ For batch analysis, you enter the input and output directories. For example, a c
 ffmchem --input /lmp/input/dir --output /xyz/output/dir --from lmp --to xyz --map 1:O 2:H --batch --atom-centric
 ```
 
-***At present, batch analysis only works when making `.xyz ` files***
+Splitting a LAMMPS trajectory is very similar to a general file conversion. An example of this is,
+
+```
+ffmchem --input dump.lammpstrj --output output_dir_name --from lammpstrj --to lmpstep --split
+```
+
+***At present, batch analysis only works when making `.xyz ` files. Generalization to all file types currently being added***
