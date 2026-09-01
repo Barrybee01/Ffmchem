@@ -281,23 +281,36 @@ def main():
 
     args = parser.parse_args()
 
+# Check for scrape options
     if args.scrape_top is not None and args.scrape_bottom is not None:
         parser.error("Cannot use both --scrape-top and --scrape-bottom simultaneously")
     elif args.scrape_top is not None:
         if not 0 <= args.scrape_top <= 1:
             parser.error("--scrape-top fraction must be between 0 and 1")
+    # Check if input is a directory (user wants to scrape existing files)
+        if Path(args.input).is_dir():
+            scrape_trajectory(args.input, args.scrape_top, "top")
+            return
+    else:
+        # Otherwise require split first
         if not args.split:
-            parser.error("--scrape-top requires --split to be used first (scrape after splitting)")
+            parser.error("--scrape-top requires --split to be used first, or --input must be a directory")
         scrape_trajectory(args.output, args.scrape_top, "top")
         return
         
-elif args.scrape_bottom is not None:
-    if not 0 <= args.scrape_bottom <= 1:
-        parser.error("--scrape-bottom fraction must be between 0 and 1")
-    if not args.split:
-        parser.error("--scrape-bottom requires --split to be used first (scrape after splitting)")
-    scrape_trajectory(args.output, args.scrape_bottom, "bottom")
-    return
+    elif args.scrape_bottom is not None:
+        if not 0 <= args.scrape_bottom <= 1:
+            parser.error("--scrape-bottom fraction must be between 0 and 1")
+        # Check if input is a directory (user wants to scrape existing files)
+        if Path(args.input).is_dir():
+            scrape_trajectory(args.input, args.scrape_bottom, "bottom")
+            return
+    else:
+        # Otherwise require split first
+        if not args.split:
+            parser.error("--scrape-bottom requires --split to be used first, or --input must be a directory")
+        scrape_trajectory(args.output, args.scrape_bottom, "bottom")
+        return
 
     if not args.split and args.scrape_top is None and args.scrape_bottom is None and args.output_format is None:
         parser.error("--to is required unless using --split or --scrape.")
