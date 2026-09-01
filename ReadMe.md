@@ -19,7 +19,7 @@ I will be slowly developing a command-line tool so that all of the converter scr
 - Numpy
 
 ## Installation Instructions
-Do the following for any Python environment::
+Do the following for any Python environment:
 
 ```
 git clone https://github.com/Barrybee01/Ffmchem.git
@@ -39,19 +39,21 @@ python -m pip install -e .
 Some structure files are available in the examples folder to use for testing. The available arguments in the tool are:
 
 ```
---help          Give the list of commands and what they do
---input         Input file for single conversion, or input directory when using batch analysis
---output        Output file for single conversion or output directory when using batch analysis
---from          The input file format
---to            The output file format
---map           Some conversions require an atom type map that relates a numerical index to an atom type. More information provided below
---mass-map      Similar to the atomic map, but includes atomic mass. This is needed for conversions to lmp format
---batch         Allows a user to perform file conversions from a folder with many structure files
---atom-centric  Takes the input file and makes a series of output files for each atom type
---coordinates   The coordinate type used in a LAMMPS simulation (scaled, unscaled, wrapped). This can be specified or automatically detected
---lattice-type  The lattice type needs to be entered for conversion to cif file format
---space-group   The space group of the lattice needs to be entered for conversion to cif file format
---split         Splits the trajectory into its individual time steps in either xyz format or lammpstrj format
+--help             Give the list of commands and what they do
+--input            Input file for single conversion, or input directory when using batch analysis
+--output           Output file for single conversion or output directory when using batch analysis
+--from             The input file format
+--to               The output file format
+--map              Some conversions require an atom type map that relates a numerical index to an atom type. More information provided below
+--mass-map         Similar to the atomic map, but includes atomic mass. This is needed for conversions to lmp format
+--batch            Allows a user to perform file conversions from a folder with many structure files
+--atom-centric     Takes the input file and makes a series of output files for each atom type
+--coordinates      The coordinate type used in a LAMMPS simulation (scaled, unscaled, wrapped). This can be specified or automatically detected
+--lattice-type     The lattice type needs to be entered for conversion to cif file format
+--space-group      The space group of the lattice needs to be entered for conversion to cif file format
+--split            Splits the trajectory into its individual time steps in either xyz format or lammpstrj format
+--scrape-top       Takes the original trajectory file, or a directory of individual files, and removes the first portion of the file(s)
+--scrape-bottom    Takes the original trajectory file, or a directory of individual files, and removes the last portion of the file(s)
 ```
 There are a few cases where an atomic map is required:  `.lmp` to `.cif`, `.lmp` to `.xyz`, `.cif` to `.lmp` and `.xyz` to `.lmp`. For example,
 
@@ -77,4 +79,10 @@ Splitting a LAMMPS trajectory is very similar to a general file conversion. An e
 ffmchem --input dump.lammpstrj --output output_dir_name --from lammpstrj --to lmpstep --split
 ```
 
-***At present, batch analysis only works when making `.xyz ` files. Generalization to all file types currently being added***
+Scraping a trajectory file or a directory of individual files can be used to reduce the size of a data set. For example, it can be used to remove everything except for the equilibrated portion of a trajectory. Another appropriate use for this feature would be to create a data set to train an ML model. An example of its use looks like,
+
+```
+ffmchem --input /dir/to/target_files --output /dir/to/target_files --from xyz --scrape-top 0.2
+```
+
+***At present, batch analysis only works when making `.xyz ` files. Generalization to all file types is currently being added***
