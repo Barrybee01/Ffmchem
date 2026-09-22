@@ -305,12 +305,12 @@ def main():
         if Path(args.input).is_dir():
             scrape_trajectory(args.input, args.scrape_bottom, "bottom")
             return
-    else:
-        # Otherwise require split first
-        if not args.split:
-            parser.error("--scrape-bottom requires --split to be used first, or --input must be a directory")
-        scrape_trajectory(args.output, args.scrape_bottom, "bottom")
-        return
+        else:
+            # Otherwise require split first
+            if not args.split:
+                parser.error("--scrape-bottom requires --split to be used first, or --input must be a directory")
+            scrape_trajectory(args.output, args.scrape_bottom, "bottom")
+            return
 
     if not args.split and args.scrape_top is None and args.scrape_bottom is None and args.output_format is None:
         parser.error("--to is required unless using --split or --scrape.")
