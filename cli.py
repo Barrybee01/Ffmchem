@@ -167,10 +167,17 @@ def run_atom_centric_conversion(args, input_file, output_target):
         output_name = input_file.with_suffix(".xyz").name
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    temp_file = output_dir / f"__tmp_{output_name}"
-    run_single_conversion(args, input_file, temp_file)
-    split_xyz_by_atom_type(temp_file, output_dir, output_name=output_name)
-    temp_file.unlink()
+
+    # XYZ files can be split directly
+    if args.input_format == "xyz":
+        split_xyz_by_atom_type(input_file,output_dir,output_name=output_name)
+
+    # Other formats must first be converted to XYZ
+    else:
+        temp_file = output_dir / f"__tmp_{output_name}"
+        run_single_conversion(args,input_file,temp_file)
+        split_xyz_by_atom_type(temp_file,output_dir,output_name=output_name)
+        temp_file.unlink()
 
 def run_batch_conversion(args):
     input_dir = Path(args.input)
